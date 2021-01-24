@@ -1,5 +1,5 @@
 #################
-#Assignment list#
+#Split tracker  #
 #1/22/2021      #
 #Corey Runkel   #
 #################
@@ -15,7 +15,7 @@ internal <- readWorkbook("internal-cfrt.xlsx", sheet = "Data", detectDates = T) 
   group_by(country, `Institutional.Role(s)`, `Adoption/Proposal.Date.(MM-DD-YYYY)`) %>%
   add_tally() %>% #add number for each entry within country-role-date group, remove subsequent countries
   ungroup() %>%
-  inner_join(codelist[,c(29,32)], by = c("country" = "iso.name.en")) %>%
+  inner_join(codelist[,c(29,32)], by = c("country" = "iso.name.en")) %>% #keep countries that have ISO name equivalents (for naming purposes)
   mutate(id=paste(countrycode(country, origin="country.name", destination = "iso3c"), substr(`Institutional.Role(s)`, 1, 1), `Adoption/Proposal.Date.(MM-DD-YYYY)`, n, sep = "_")) #construct unique persistent id: country_role_date_number
 
 #assign people to countries
@@ -36,5 +36,5 @@ cfrt <- createWorkbook()
 #create function to make one sheet
 for (i in names(assignments)) {
   addWorksheet(cfrt, i)
-  writeData(cfrt, i, filter(internal, country %in% assignments[[i]]))
+  writeData(cfrt, i, filter(internal, country %in% assignments[[i]]), colNames = T) #create a sheet named i filled with entries assigned to i, and keep the column names
 }
